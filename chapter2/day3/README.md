@@ -65,6 +65,17 @@ people.append("Ochako Unaraka") // anyone watch My Hero Academia? :D
 log(people) // ["Jacob", "Alice", "Damian", "Ochako Unaraka"]
 ```
 
+**contains(_ element_: Type): Bool** 
+
+Checks to see if an array contains an element.
+
+ex.
+```swift
+var people: [String] = ["Jacob", "Alice", "Damian"]
+log(people.contains("Jacob")) // true
+log(people.contains("Poop")) // false
+```
+
 **remove(index: Int)** 
 
 Removes an element at the given index (index starts from 0, meaning the first element has index 0)
@@ -72,6 +83,7 @@ Removes an element at the given index (index starts from 0, meaning the first el
 ex.
 ```swift
 var people: [String] = ["Jacob", "Alice", "Damian"]
+people.remove(1)
 log(people) // ["Jacob", "Damian"]
 ```
 
