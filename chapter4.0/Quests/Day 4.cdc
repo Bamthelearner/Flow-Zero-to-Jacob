@@ -1,10 +1,12 @@
-1. Brainstorm some extra things we may want to add to this contract. Think about what might be problematic with this contract and how we could fix it.
+Above, when I was talking about the difficulty of sending a transaction with 2 signers, I wrote this:
 
-    Idea #1: Do we really want everyone to be able to mint an NFT? (insert thinking emoji here). 
-        We should make minting NFT an admin function , 
-        we can put the minting function inside a resource which only stores in the contract account storage.
+/*The only problem here is that it's *usually* not good practice to require two signers in a transaction. 
+This is because it's difficult to get multiple people to sign the same transaction in a reasonable time frame. 
+We will go much more in-depth on this at a later point, but for now, we can leave it at that.*/ 
 
-    Idea #2: If we want to read information about our NFTs inside our Collection, 
-    right now we have to take it out of the Collection to do so. Is this good?
-        We can have functions in the Collection (and also expose to the public) to return the reference to the ownedNFTs,
-        so that when people want to get information of the ownedNFTs, they can borrow the reference.
+Can you brainstorm any ways to distribute Minters to other people WITHOUT having to have 2 signers, 
+or in other words, 2 AuthAccounts? If you can't that is okay. But try your best to come up with something. 
+We will learn this later down the road as well.
+
+Answer: 
+We can have a Minter Collection which stores the minter. Expose the deposit function like Collection does with Public Interface.
