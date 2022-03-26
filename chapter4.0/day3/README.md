@@ -17,7 +17,7 @@ Let's spend the next few days working through a NonFungibleToken example. We are
 
 Let's start by making a contract:
 
-```swift
+```javascript
 pub contract CryptoPoops {
   pub var totalSupply: UInt64
 
@@ -48,7 +48,7 @@ We start off by:
 
 Alright, that's easy. Let's store an NFT in our account storage and make it readable to the public.
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -61,9 +61,9 @@ transaction() {
 }
 ```
 
-Nice! You should understand this now because of the last chapter. We first save the NFT to account storage, and then link a reference to it to the public so we can read its `id` field. Well, let's do that!
+Nice! You should understand this now because of the last chapter. We first save the NFT to account storage, and then link a reference to it to the public so we can read its `id` field with a script. Well, let's do that!
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 pub fun main(address: Address): UInt64 {
   let nft = getAccount(address).getCapability(/public/MyNFT)
@@ -77,7 +77,7 @@ pub fun main(address: Address): UInt64 {
 
 Awesome! We did some good stuff. But let's think about this for a second. What would happen if we want to store *another* NFT in our account?
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -92,7 +92,7 @@ transaction() {
 
 Look what happened. We got an error! Why? Because an NFT already exists at that storage path. How can we fix this? Well, we could just specify a different storage path...
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -112,7 +112,7 @@ The second problem is that nobody can give us NFTs. Since only the account owner
 
 The way to fix both of these problems is to create a "Collection," or a container that wraps all of our NFTs into one. Then, we can store the Collection at 1 storage path, and also allow others to "deposit" into that Collection.
 
-```swift
+```javascript
 pub contract CryptoPoops {
   pub var totalSupply: UInt64
 
@@ -183,7 +183,7 @@ Awesome. We've defined a `Collection` resource that does a few things:
 
 We also defined a `createEmptyCollection` function so we can save a `Collection` to our account storage so we can manage our NFTs better. Let's do that now:
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -208,7 +208,7 @@ The problem, though, is that we do want the public to be able to `deposit` NFTs 
 
 Resource interfaces, woop woop! Let's define a resource interface to restrict what we expose to the public:
 
-```swift
+```javascript
 pub contract CryptoPoops {
   pub var totalSupply: UInt64
 
@@ -269,7 +269,7 @@ pub contract CryptoPoops {
 
 Now we can restrict what the public can see when we save our Collection to account storage:
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -284,14 +284,15 @@ transaction() {
 ```
 
 <img src="../images/thanos.png" />
-Now this... does put a smile on my face. Let's experiment with depositing and withdrawing an NFT to from our account.
+Now this... does put a smile on my face. Let's experiment by depositing an NFT to our account and withdrawing it.
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
     // Get a reference to our `CryptoPoops.Collection`
     let collection = signer.borrow<&CryptoPoops.Collection>(from: /storage/MyCollection)
+                      ?? panic("The recipient does not have a Collection.")
     
     // deposits an `NFT` to our Collection
     collection.deposit(token: <- CryptoPoops.createNFT())
@@ -299,7 +300,7 @@ transaction() {
     log(collection.getIDs()) // [2353]
 
     // withdraw the `NFT` from our Collection
-    let nft <- collection.withdraw(withdrawID: 2353)
+    let nft <- collection.withdraw(withdrawID: 2353) // We get this number from the ids array above
   
     log(collection.getIDs()) // []
 
@@ -310,14 +311,14 @@ transaction() {
 
 Awesome! So everything is working well. Now let's see if someone else can deposit to OUR Collection instead of doing it ourselves:
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 transaction(recipient: Address) {
 
   prepare(otherPerson: AuthAccount) {
     // Get a reference to the `recipient`s public Collection
     let recipientsCollection = getAccount(recipient).getCapability(/public/MyCollection)
-                                  .borrow<&CryptoPoops.Collection{CryptoPoops.CollectionPublic}>
+                                  .borrow<&CryptoPoops.Collection{CryptoPoops.CollectionPublic}>()
                                   ?? panic("The recipient does not have a Collection.")
     
     // deposits an `NFT` to our Collection
@@ -327,16 +328,18 @@ transaction(recipient: Address) {
 }
 ```
 
-Niiiiiice. We deposited to someone elses account, which is fully possible because they linked `&CryptoPoops.Collection{CryptoPoops.CollectionPublic}` to the public. What happens if we try to withdraw from someone's Collection?
+Niiiiiice. We deposited to someone elses account, which is fully possible because they linked `&CryptoPoops.Collection{CryptoPoops.CollectionPublic}` to the public. And this is fine. Who cares if we give someone a free NFT? That's awesome! 
 
-```swift
+Now, what happens if we try to withdraw from someone's Collection?
+
+```javascript
 import CryptoPoops from 0x01
 transaction(recipient: Address, withdrawID: UInt64) {
 
   prepare(otherPerson: AuthAccount) {
     // Get a reference to the `recipient`s public Collection
     let recipientsCollection = getAccount(recipient).getCapability(/public/MyCollection)
-                                  .borrow<&CryptoPoops.Collection{CryptoPoops.CollectionPublic}>
+                                  .borrow<&CryptoPoops.Collection{CryptoPoops.CollectionPublic}>()
                                   ?? panic("The recipient does not have a Collection.")
     
     // ERROR: "Member of restricted type is not accessible: withdraw"
@@ -350,7 +353,7 @@ We get an error! Perfect, the hacker cannot steal our NFTs :)
 
 Lastly, let's try to read the NFTs in our account using a script:
 
-```swift
+```javascript
 import CryptoPoops from 0x01
 pub fun main(address: Address): [UInt64] {
   let publicCollection = getAccount(address).getCapability(/public/MyCollection)
@@ -371,10 +374,12 @@ And with that, give yourself a round of applause. You implemented a functioning 
 
 ## Quests
 
-1. What do you have to do if you have resources "nested" inside of another resource? ("Nested resources")
+1. Why did we add a Collection to this contract? List the two main reasons.
 
-2. Brainstorm some extra things we may want to add to this contract. Think about what might be problematic with this contract and how we could fix it.
+2. What do you have to do if you have resources "nested" inside of another resource? ("Nested resources")
 
-Idea #1: Do we really want everyone to be able to mint an NFT? (insert thinking emoji here). 
+3. Brainstorm some extra things we may want to add to this contract. Think about what might be problematic with this contract and how we could fix it.
 
-Idea #2: If we want to read information about our NFTs inside our Collection, right now we have to take it out of the Collection to do so. Is this good?
+    - Idea #1: Do we really want everyone to be able to mint an NFT? 🤔. 
+
+    - Idea #2: If we want to read information about our NFTs inside our Collection, right now we have to take it out of the Collection to do so. Is this good?

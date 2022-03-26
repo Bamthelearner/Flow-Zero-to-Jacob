@@ -12,13 +12,9 @@ We will cover the rest tomorrow.
 
 If you remember back to Chapter 2 Day 1 when we learned about transactions, I also talked about accounts on flow and how they can store data. I'm going to copy and paste that below because it's helpful to review:
 
-```
 On Flow, accounts can store their own data. What does this mean? Well, if I own an NFT on Flow, that NFT gets stored in my account. This is *very different* than other blockchains like Ethereum. On Ethereum, your NFT gets stored in the smart contract. On Flow, we actually allow accounts to store their own data themselves, which is super cool. But how do we access the data in their account? We can do that with the `AuthAccount` type. Every time a user (like you and me) sends a transaction, you have to pay for the transaction, and then you "sign" it. All that means is you clicked a button saying "hey, I want to approve this transaction." When you sign it, the transaction takes in your `AuthAccount` and can access the data in your account. 
-```
 
-```
 You can see this being done in the `prepare` portion of the transaction, and that's the whole point of the `prepare` phase: to access the information/data in your account. On the other hand, the `execute` phase can't do that. But it can call functions and do stuff to change the data on the blockchain. NOTE: In reality, you never *actually* need the `execute` phase. You could technically do everything in the `prepare` phase, but the code is less clear that way. It's better to separate the logic.
-```
  
 ## What lives in an account?
 
@@ -43,7 +39,7 @@ The key part to remember is that only the account owner can ever access their `/
 
 You may be wondering: "well, how do I access my `/storage/`?" The answer is your `AuthAccount` type. If you remember, when you sign a transaction, the signer's `AuthAccount` gets placed as a parameter in the `prepare` phase, like so:
 
-```swift
+```javascript
 transaction() {
   prepare(signer: AuthAccount) {
     // We can access the signer's /storage/ path here!
@@ -61,7 +57,7 @@ As you can see above, we can access the signer's `/storage/` in the `prepare` ph
 
 Let's practice storing something in an account. First let's define a contract:
 
-```swift
+```javascript
 pub contract Stuff {
 
   pub resource Test {
@@ -80,7 +76,7 @@ pub contract Stuff {
 
 We have defined a simple contract that lets you create and return a `@Test` resource type. Let's get this in a transaction:
 
-```swift
+```javascript
 import Stuff from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -96,7 +92,7 @@ transaction() {
 
 All we're doing is creating and destroying a `@Test`. But what if we wanted to store it in our account? Let's see how that's done, and then we'll walk through it:
 
-```swift
+```javascript
 import Stuff from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -120,7 +116,7 @@ Look at how we saved it to our account. First, we **have to have an `AuthAccount
 
 In the example above, I saved `testResource` (note the `<-` syntax since it's a resource) to the path `/storage/MyTestResource`. Now, anytime we want to get it, we can go to that path. Let's do that below.
 
-```swift
+```javascript
 import Stuff from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -145,7 +141,7 @@ You'll notice that we have to do this weird thing: `<@Stuff.Test>`. What is that
 
 One more important thing is that when you `load` data from storage, it returns an optional. `testResource` actually has type `@Stuff.Test?`. The reason for this is because Cadence has no idea that you are telling the truth and something actually lives there, or that it's even the right type. So if you were wrong, it will return `nil`. Let's look at an example:
 
-```swift
+```javascript
 import Stuff from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -163,7 +159,7 @@ transaction() {
 
 See? It is an optional. To fix this, we can either use `panic` or the `!` operator. I like to use `panic` because you can specify an error message.
 
-```swift
+```javascript
 import Stuff from 0x01
 transaction() {
   prepare(signer: AuthAccount) {
@@ -184,7 +180,7 @@ transaction() {
 
 Previously, we saved and loaded from our account. But what if we just want to look at something in an account? That's where references and the `.borrow()` function comes in.
 
-```swift 
+```javascript 
 import Stuff from 0x01
 transaction() {
   prepare(signer: AuthAccount) {

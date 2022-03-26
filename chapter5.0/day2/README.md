@@ -12,7 +12,7 @@ The good news about todays lesson is it's actually pretty easy. You have learned
 
 Contract interfaces are pretty much exactly like resource interfaces, except they are for contracts. There are a few differences though, like "how do we define contract interfaces?" Let's look below:
 
-```swift
+```javascript
 pub contract interface IHelloWorld {
 
 }
@@ -24,7 +24,7 @@ You deploy a contract interface just like you do a normal contract. The only dif
 
 Similar to resource interfaces, you can't initialize any variables or define any functions. Here's an example interface:
 
-```swift
+```javascript
 pub contract interface IHelloWorld {
   pub var greeting: String
   
@@ -34,7 +34,7 @@ pub contract interface IHelloWorld {
 
 We can take this contract interface and implement it on an actual contract:
 
-```swift
+```javascript
 import IHelloWorld from 0x01
 pub contract HelloWorld: IHelloWorld {
 
@@ -46,7 +46,7 @@ You'll notice we implement it just like we do with resources, using the `: {cont
 You'll also notice we get some errors: "contract `HelloWorld` does not conform to contract interface `IHelloWorld`". Why is this? Well, because we haven't implemented the stuff of course!
 
 
-```swift
+```javascript
 import IHelloWorld from 0x01
 pub contract HelloWorld: IHelloWorld {
   pub var greeting: String
@@ -67,7 +67,7 @@ Ahh, all better now. Awesome!
 
 We learned yesterday about pre/post-conditions. The great thing about them is we can actually use them inside a resource interface or contract interface, like so:
 
-```swift
+```javascript
 pub contract interface IHelloWorld {
   pub var greeting: String
   
@@ -90,7 +90,7 @@ This is a great way for us to make sure people are following our rules.
 
 Let's get fancy, shall we? Let's add a resource and a resource interface to our contract interface:
 
-```swift
+```javascript
 pub contract interface IHelloWorld {
   pub var greeting: String
   
@@ -114,7 +114,7 @@ Lookey here! We have defined a resource named `Greeting` and a resource interfac
 
 This is very important to understand. If we define our own contract that defines it's own `IGreeting`, like so:
 
-```swift
+```javascript
 import IHelloWorld from 0x01
 pub contract HelloWorld: IHelloWorld {
   pub var greeting: String
@@ -145,7 +145,7 @@ pub contract HelloWorld: IHelloWorld {
 
 ... we will get an error. The reason we're getting an error is because our contract interface specifically says our `Greeting` resource must implement `IHelloWorld.IGreeting`, not any arbitary `IGreeting` that someone defines. So this is what the contract would actually look like:
 
-```swift
+```javascript
 import IHelloWorld from 0x01
 pub contract HelloWorld: IHelloWorld {
   pub var greeting: String
@@ -180,7 +180,7 @@ Contract interfaces allow you to specify some requirements on an implementing co
 
 Wouldn't it be helpful if we could rationalize that a contract was an "NFT Contract" without actually reading it's code? Well, it already exists! The NonFungibleToken contract interface (otherwise known as the NonFungibleToken standard) is a contract interface that defines what NFT Contracts must have to be deemed "NFT Contracts." This is helpful so clients like a Marketplace DApp can understand what they're looking at, and most importantly, **not have to implement different functionality for every NFT contract.**
 
-Standardizing is incredibly benefitial so that a client using multiple contracts can have a singular way of interacting with all of those contracts. For example, all NFT contracts have a resource called Collection that has a `deposit` and `withdraw` function. This way, even if the client DApp is interacting with 100 NFT contracts, it only has to import the NonFungibleToken standard to call those functions, since it's all under one generic type. 
+Standardizing is incredibly beneficial so that a client using multiple contracts can have a singular way of interacting with all of those contracts. For example, all NFT contracts have a resource called Collection that has a `deposit` and `withdraw` function. This way, even if the client DApp is interacting with 100 NFT contracts, it only has to import the NonFungibleToken standard to call those functions, since it's all under one generic type. 
 
 You can read more about it here: https://github.com/onflow/flow-nft
 
@@ -192,14 +192,14 @@ Coincidentally, contract interfaces are (in my opinion) the most heavily debated
 
 ## Quests
 
-1. Explain why standards can be benefitial to the Flow ecosystem.
+1. Explain why standards can be beneficial to the Flow ecosystem.
 
 2. What is YOUR favourite food?
 
 3. Please fix this code (Hint: There are two things wrong):
 
 The contract interface:
-```swift
+```javascript
 pub contract interface ITest {
   pub var number: Int
   
@@ -223,7 +223,7 @@ pub contract interface ITest {
 ```
 
 The implementing contract:
-```swift
+```javascript
 pub contract Test {
   pub var number: Int
   
